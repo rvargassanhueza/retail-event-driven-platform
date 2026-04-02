@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  # Base de datos transaccional principal
+  postgres:
+    image: postgres:15-alpine
+    container_name: eda_postgres_db
+    environment:
+      POSTGRES_USER: admin_retail
+      POSTGRES_PASSWORD: secure_password_123
+      POSTGRES_DB: retail_orders_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - eda_network
+
+  # Emulador Oficial de Google Cloud Pub/Sub
+  pubsub-emulator:
+    image: gcr.io/google.com/cloudsdktool/google-cloud-cli:emulators
+    container_name: eda_pubsub_emulator
+    command: gcloud beta emulators pubsub start --project=retail-global-poc --host-port=0.0.0.0:8085
+    ports:
+      - "8085:8085"
+    networks:
+      - eda_network
+
+networks:
+  eda_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
